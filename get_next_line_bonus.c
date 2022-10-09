@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/09 15:54:48 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/09 16:27:53 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,18 +121,3 @@ int	strcat_c(char *dst, char *src, int stop)
 	dst[len + i] = 0;
 	return (-1);
 }
-/*
-		ret = read(fd, buff, READ_BUFF_SIZE);
-		if (ret)
-		{
-			if (ret < READ_BUFF_SIZE)
-				buff[ret] = 0;
-			line = concat(line, buff, &realloc, rest);
-			if (!line)
-				return (0);
-			if (realloc == -1)
-				return (line);
-		}
-		else
-			return (line);
-*/
