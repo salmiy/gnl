@@ -1,37 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/09 14:05:04 by ysalmi           ###   ########.fr       */
+/*   Created: 2022/10/09 14:05:11 by ysalmi            #+#    #+#             */
+/*   Updated: 2022/10/09 15:55:21 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-void	*ft_calloc(int n)
-{
-	void	*r;
-	int		i;
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdio.h>
 
-	i = -1;
-	r = malloc(n);
-	if (!r)
-		return (0);
-	while (++i < n)
-		((char *)r)[i] = 0;
-	return (r);
-}
+# define LINE_MIN_SIZE 128
+# define READ_BUFF_SIZE 1
 
-int	ft_strlen(char *s)
-{
-	int	i;
+char	*get_next_line(int fd);
+char	*concat(char *dst, char *src, int *relloc, char *rest);
+char	*ft_realloc(char *s, int *realloc);
+int		strcat_c(char *dst, char *src, int stop);
 
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
+void	*ft_calloc(int n);
+int		ft_strlen(char *s);
+#endif
