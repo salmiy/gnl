@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 14:05:11 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/09 15:55:21 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/10 13:15:07 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 char	*get_next_line(int fd);
 char	*concat(char *dst, char *src, int *relloc, char *rest);
 char	*ft_realloc(char *s, int *realloc);
-int		strcat_c(char *dst, char *src, int stop);
+void	ft_strcat(char *dst, char *src, int start, int stop);
 
 void	*ft_calloc(int n);
+int		ft_strchr(char *s, char c, int len);
 int		ft_strlen(char *s);
 #endif

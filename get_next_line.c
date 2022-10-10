@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/09 16:27:26 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/10 12:52:43 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,21 @@ char	*get_next_line(int fd)
 		return (line);
 	while (1)
 	{
+		rest[0] = 0;
 		ret = read_next_line(fd, &line, rest, &realloc);
-		if (!ret)
+		if (!ret || (ret == 1 && !*line))
 			return (0);
 		else if (ret == 1)
 			return (line);
-		else if (ret < 0)
-			return (0);
 	}
 }
+
+/*
+ *	return:
+ *		0: allocation error
+ *		1: finished reading line
+ *		2: still need to read more
+ */
 
 int	read_next_line(int fd, char **line, char *rest, int *realloc)
 {
@@ -48,7 +54,7 @@ int	read_next_line(int fd, char **line, char *rest, int *realloc)
 	char	buff[READ_BUFF_SIZE];
 
 	ret = read(fd, buff, READ_BUFF_SIZE);
-	if (ret)
+	if (ret > 0)
 	{
 		if (ret < READ_BUFF_SIZE)
 			buff[ret] = 0;
@@ -59,8 +65,7 @@ int	read_next_line(int fd, char **line, char *rest, int *realloc)
 			return (1);
 		return (2);
 	}
-	else
-		return (-1);
+	return (1);
 }
 
 char	*concat(char *dst, char *src, int *realloc, char *rest)
@@ -68,22 +73,25 @@ char	*concat(char *dst, char *src, int *realloc, char *rest)
 	int	dst_size;
 	int	dst_len;
 	int	src_max;
-	int	crsr;
+	int	pos;
 
 	dst_size = (*realloc + 1) * LINE_MIN_SIZE;
 	dst_len = ft_strlen(dst);
 	src_max = READ_BUFF_SIZE;
+	pos = ft_strchr(src, '\n', READ_BUFF_SIZE);
 	if (dst_size - dst_len < src_max)
 		dst = ft_realloc(dst, realloc);
 	if (!dst)
 		return (0);
-	crsr = strcat_c(dst, src, READ_BUFF_SIZE);
-	if (crsr > -1 && src[crsr - 1])
+	if (pos >= 0)
 	{
+		ft_strcat(dst, src, 0, pos + 1);
 		rest[0] = 0;
-		strcat_c(rest, &src[crsr], READ_BUFF_SIZE - crsr);
+		ft_strcat(rest, src, pos + 1, READ_BUFF_SIZE);
 		*realloc = -1;
 	}
+	else
+		ft_strcat(dst, src, 0, READ_BUFF_SIZE);
 	return (dst);
 }
 
@@ -95,29 +103,22 @@ char	*ft_realloc(char *s, int *realloc)
 	r = ft_calloc((*realloc + 1) * LINE_MIN_SIZE);
 	if (!r)
 		return (0);
-	strcat_c(r, s, ft_strlen(s));
+	ft_strcat(r, s, 0, ft_strlen(s));
 	free(s);
 	return (r);
 }
 
-int	strcat_c(char *dst, char *src, int stop)
+void	ft_strcat(char *dst, char *src, int start, int stop)
 {
 	int	i;
 	int	len;
 
 	len = ft_strlen(dst);
-	i = 0;
-	while (i < stop)
+	i = start;
+	while (src[i] && i < stop)
 	{
-		if (stop == READ_BUFF_SIZE && src[i] == '\n')
-		{
-			dst[len + i] = src[i];
-			dst[len + ++i] = 0;
-			return (i);
-		}
-		dst[len + i] = src[i];
+		dst[len++] = src[i];
 		i++;
 	}
-	dst[len + i] = 0;
-	return (-1);
+	dst[len] = 0;
 }
