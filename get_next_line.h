@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 14:05:11 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/10 13:32:26 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/11 19:57:57 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,21 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# define LINE_MIN_SIZE 128
-# define READ_BUFF_SIZE 64
+# define CHUNK_SIZE 128
+
+typedef struct s_chunk
+{
+	struct s_chunk	*next;
+	char			content[CHUNK_SIZE];
+}	t_chunk;
 
 char	*get_next_line(int fd);
-char	*concat(char *dst, char *src, int *relloc, char *rest);
-char	*ft_realloc(char *s, int *realloc);
-void	ft_strcat(char *dst, char *src, int start, int stop);
+char	*line_from_rest(char *rest);
+char	*line_from_chunk(char *rest, t_chunk *first, int n);
+char	*clear_chunks(t_chunk *first);
+void	concat(char *dst, char *src, int len);
 
-void	*ft_calloc(int n);
 int		ft_strchr(char *s, char c, int len);
 int		ft_strlen(char *s);
+
 #endif

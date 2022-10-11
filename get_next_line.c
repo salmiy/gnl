@@ -6,119 +6,107 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/10 12:52:43 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/11 19:57:12 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	read_next_line(int fd, char **line, char *rest, int *realloc);
-
 char	*get_next_line(int fd)
 {
-	static char	*rest;
-	char		*line;
-	int			realloc;
+	static char	rest[CHUNK_SIZE];
+	t_chunk		*first;
+	t_chunk		*curs;
 	int			ret;
+	int			i;
 
-	line = ft_calloc(LINE_MIN_SIZE);
-	if (!rest)
-		rest = ft_calloc(READ_BUFF_SIZE);
-	if (!line || !rest)
-		return (0);
-	realloc = 0;
-	line = concat(line, rest, &realloc, rest);
-	if (realloc == -1)
-		return (line);
-	while (1)
+	if (ft_strchr(rest, '\n', CHUNK_SIZE) > -1)
+		return (line_from_rest(rest));
+	curs = malloc(sizeof(t_chunk));
+	first = curs;
+	i = 0;
+	while (++i)
 	{
-		rest[0] = 0;
-		ret = read_next_line(fd, &line, rest, &realloc);
-		if (!ret || (ret == 1 && !*line))
-			return (0);
-		else if (ret == 1)
-			return (line);
+		if (!curs)
+			return (clear_chunks(first));
+		curs->next = 0;
+		ret = read(fd, curs->content, CHUNK_SIZE);
+		if (ret < CHUNK_SIZE)
+			curs->content[ret * (ret >= 0)] = 0;
+		if (ret < 1 || ft_strchr(curs->content, '\n', CHUNK_SIZE) > -1)
+			break ;
+		curs->next = malloc(sizeof(t_chunk));
+		curs = curs->next;
 	}
+	return (line_from_chunk(rest, first, i));
 }
 
-/*
- *	return:
- *		0: allocation error
- *		1: finished reading line
- *		2: still need to read more
- */
-
-int	read_next_line(int fd, char **line, char *rest, int *realloc)
+char	*line_from_rest(char *rest)
 {
-	int		ret;
-	char	buff[READ_BUFF_SIZE];
+	int		pos;
+	char	*line;
 
-	ret = read(fd, buff, READ_BUFF_SIZE);
-	if (ret > 0)
-	{
-		if (ret < READ_BUFF_SIZE)
-			buff[ret] = 0;
-		*line = concat(*line, buff, realloc, rest);
-		if (!line)
-			return (0);
-		if (*realloc == -1)
-			return (1);
-		return (2);
-	}
-	return (1);
-}
-
-char	*concat(char *dst, char *src, int *realloc, char *rest)
-{
-	int	dst_size;
-	int	dst_len;
-	int	src_max;
-	int	pos;
-
-	dst_size = (*realloc + 1) * LINE_MIN_SIZE;
-	dst_len = ft_strlen(dst);
-	src_max = READ_BUFF_SIZE;
-	pos = ft_strchr(src, '\n', READ_BUFF_SIZE);
-	if (dst_size - dst_len < src_max)
-		dst = ft_realloc(dst, realloc);
-	if (!dst)
+	pos = ft_strchr(rest, '\n', CHUNK_SIZE);
+	line = malloc(pos + 1);
+	if (!line)
 		return (0);
-	if (pos >= 0)
-	{
-		ft_strcat(dst, src, 0, pos + 1);
-		rest[0] = 0;
-		ft_strcat(rest, src, pos + 1, READ_BUFF_SIZE);
-		*realloc = -1;
-	}
-	else
-		ft_strcat(dst, src, 0, READ_BUFF_SIZE);
-	return (dst);
+	line[0] = 0;
+	concat(line, rest, pos);
+	rest[0] = 0;
+	concat(rest, &rest[pos], CHUNK_SIZE - pos);
+	return (line);
 }
 
-char	*ft_realloc(char *s, int *realloc)
+char	*line_from_chunk(char *rest, t_chunk *first, int n)
 {
-	char	*r;
+	char	*line;
+	t_chunk	*curs;
+	int		pos;
 
-	*realloc += 1;
-	r = ft_calloc((*realloc + 1) * LINE_MIN_SIZE);
-	if (!r)
+	if (n == 1 && !first->content[0])
+		return (clear_chunks(first));
+	line = malloc((size_t) n * CHUNK_SIZE + ft_strlen(rest));
+	if (!line)
 		return (0);
-	ft_strcat(r, s, 0, ft_strlen(s));
-	free(s);
-	return (r);
+	line[0] = 0;
+	concat(line, rest, CHUNK_SIZE);
+	curs = first;
+	while (curs->next)
+	{
+		concat(line, curs->content, CHUNK_SIZE);
+		curs = curs->next;
+	}
+	pos = ft_strchr(curs->content, '\n', CHUNK_SIZE);
+	concat(line, curs->content, pos);
+	rest[0] = 0;
+	concat(rest, &curs->content[pos], CHUNK_SIZE - pos);
+	clear_chunks(first);
+	if (!*line)
+		return (0);
+	return (line);
 }
 
-void	ft_strcat(char *dst, char *src, int start, int stop)
+void	concat(char *dst, char *src, int len)
 {
 	int	i;
-	int	len;
+	int	j;
 
-	len = ft_strlen(dst);
-	i = start;
-	while (src[i] && i < stop)
+	i = 0;
+	j = ft_strlen(dst);
+	while (src[i] && i < len)
+		dst[j++] = src[i++];
+	dst[j] = 0;
+}
+
+char	*clear_chunks(t_chunk *first)
+{
+	t_chunk	*aux;
+
+	while (first)
 	{
-		dst[len++] = src[i];
-		i++;
+		aux = first->next;
+		free(first);
+		first = aux;
 	}
-	dst[len] = 0;
+	return (0);
 }
