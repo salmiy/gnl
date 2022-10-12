@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/11 19:59:15 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/12 11:07:43 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*get_next_line(int fd)
 {
-	static char	rest[MAX_DESCRIPTORS][CHUNK_SIZE];
+	static char	rest[OPEN_MAX][CHUNK_SIZE];
 	t_chunk		*first;
 	t_chunk		*curs;
 	int			ret;
