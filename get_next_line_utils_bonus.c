@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/11 19:51:17 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/19 15:32:59 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,4 +30,16 @@ int	ft_strlen(char *s)
 	while (s[i])
 		i++;
 	return (i);
+}
+
+void	concat(char *dst, char *src, int len)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = ft_strlen(dst);
+	while (src[i] && i < len)
+		dst[j++] = src[i++];
+	dst[j] = 0;
 }

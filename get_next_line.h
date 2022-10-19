@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 14:05:11 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/12 11:08:13 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/10/18 12:38:41 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,14 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-# define CHUNK_SIZE 128
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 128
+# endif
 
 typedef struct s_chunk
 {
 	struct s_chunk	*next;
-	char			content[CHUNK_SIZE];
+	char			content[BUFFER_SIZE];
 }	t_chunk;
 
 char	*get_next_line(int fd);
