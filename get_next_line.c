@@ -6,39 +6,56 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/18 16:20:40 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/05 13:06:37 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+t_chunk	*read_chunks(int fd, int *i);
+
 char	*get_next_line(int fd)
 {
 	static char	rest[BUFFER_SIZE];
 	t_chunk		*first;
-	t_chunk		*curs;
-	int			r;
-	int			i;
+	int			n;
 
 	if (ft_strchr(rest, '\n', BUFFER_SIZE) > -1)
 		return (line_from_rest(rest));
+	n = 0;
+	first = read_chunks(fd, &n);
+	if (!first)
+		return (0);
+	return (line_from_chunk(rest, first, n));
+}
+
+t_chunk	*read_chunks(int fd, int *i)
+{
+	t_chunk	*first;
+	t_chunk	*curs;
+	int		r;
+
 	curs = malloc(sizeof(t_chunk));
 	first = curs;
-	i = 0;
-	while (++i)
+	while (++(*i))
 	{
 		if (!curs)
-			return (clear_chunks(first));
+		{
+			clear_chunks(first);
+			return (0);
+		}
 		curs->next = 0;
 		r = read(fd, curs->content, BUFFER_SIZE);
-		if (r < BUFFER_SIZE)
-			curs->content[r * (r >= 0)] = 0;
+		if (r >= 0 && r < BUFFER_SIZE)
+			curs->content[r] = 0;
+		else if (r < 0)
+			curs->content[0] = 0;
 		if (r < BUFFER_SIZE || ft_strchr(curs->content, '\n', BUFFER_SIZE) > -1)
 			break ;
 		curs->next = malloc(sizeof(t_chunk));
 		curs = curs->next;
 	}
-	return (line_from_chunk(rest, first, i));
+	return (first);
 }
 
 char	*line_from_rest(char *rest)
@@ -65,7 +82,7 @@ char	*line_from_chunk(char *rest, t_chunk *first, int n)
 
 	if (n == 1 && !first->content[0] && !rest[0])
 		return (clear_chunks(first));
-	line = malloc((size_t) n * BUFFER_SIZE + ft_strlen(rest));
+	line = malloc((size_t) n * BUFFER_SIZE + ft_strlen(rest) + 1);
 	if (!line)
 		return (0);
 	line[0] = 0;
@@ -80,22 +97,10 @@ char	*line_from_chunk(char *rest, t_chunk *first, int n)
 	pos = pos * (pos > -1) + BUFFER_SIZE * (pos < 0);
 	concat(line, curs->content, pos);
 	rest[0] = 0;
-	concat(rest, &curs->content[pos], BUFFER_SIZE - pos);
-	if (!clear_chunks(first) && !*line)
-		return (0);
+	if (pos < BUFFER_SIZE)
+		concat(rest, &curs->content[pos], BUFFER_SIZE - pos);
+	clear_chunks(first);
 	return (line);
-}
-
-void	concat(char *dst, char *src, int len)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = ft_strlen(dst);
-	while (src[i] && i < len)
-		dst[j++] = src[i++];
-	dst[j] = 0;
 }
 
 char	*clear_chunks(t_chunk *first)

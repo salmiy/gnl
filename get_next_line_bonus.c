@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/19 15:30:40 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/05 14:49:09 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,10 @@ t_chunk	*read_chunks(int fd, int *i)
 		}
 		curs->next = 0;
 		r = read(fd, curs->content, BUFFER_SIZE);
-		if (r < BUFFER_SIZE)
-			curs->content[r * (r >= 0)] = 0;
+		if (r > 0 && r < BUFFER_SIZE)
+			curs->content[r] = 0;
+		else if (r <= 0)
+			curs->content[0] = 0;
 		if (r < BUFFER_SIZE || ft_strchr(curs->content, '\n', BUFFER_SIZE) > -1)
 			break ;
 		curs->next = malloc(sizeof(t_chunk));
@@ -80,7 +82,7 @@ char	*line_from_chunk(char *rest, t_chunk *first, int n)
 
 	if (n == 1 && !first->content[0] && !rest[0])
 		return (clear_chunks(first));
-	line = malloc((size_t) n * BUFFER_SIZE + ft_strlen(rest));
+	line = malloc((size_t) n * BUFFER_SIZE + ft_strlen(rest) + 1);
 	if (!line)
 		return (0);
 	line[0] = 0;
@@ -95,9 +97,9 @@ char	*line_from_chunk(char *rest, t_chunk *first, int n)
 	pos = pos * (pos > -1) + BUFFER_SIZE * (pos < 0);
 	concat(line, curs->content, pos);
 	rest[0] = 0;
-	concat(rest, &curs->content[pos], BUFFER_SIZE - pos);
-	if (!clear_chunks(first) && !*line)
-		return (0);
+	if (pos < BUFFER_SIZE)
+		concat(rest, &curs->content[pos], BUFFER_SIZE - pos);
+	clear_chunks(first);
 	return (line);
 }
 
