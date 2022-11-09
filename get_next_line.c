@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/11/05 13:06:37 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/09 14:55:34 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ char	*get_next_line(int fd)
 	t_chunk		*first;
 	int			n;
 
+	if (fd < 0 || fd == 1 || fd == 2)
+		return (0);
 	if (ft_strchr(rest, '\n', BUFFER_SIZE) > -1)
 		return (line_from_rest(rest));
 	n = 0;
@@ -29,30 +31,41 @@ char	*get_next_line(int fd)
 	return (line_from_chunk(rest, first, n));
 }
 
+t_chunk	*new_chunk(void)
+{
+	t_chunk	*new;
+
+	new = malloc(sizeof(t_chunk));
+	if (new)
+	{
+		new->content = malloc(BUFFER_SIZE);
+		if (new->content)
+			return (new);
+		free(new);
+		return (0);
+	}
+	return (0);
+}
+
 t_chunk	*read_chunks(int fd, int *i)
 {
 	t_chunk	*first;
 	t_chunk	*curs;
 	int		r;
 
-	curs = malloc(sizeof(t_chunk));
+	curs = new_chunk();
 	first = curs;
 	while (++(*i))
 	{
 		if (!curs)
-		{
-			clear_chunks(first);
-			return (0);
-		}
+			return ((t_chunk *)clear_chunks(first));
 		curs->next = 0;
 		r = read(fd, curs->content, BUFFER_SIZE);
-		if (r >= 0 && r < BUFFER_SIZE)
-			curs->content[r] = 0;
-		else if (r < 0)
-			curs->content[0] = 0;
+		if (r < BUFFER_SIZE)
+			curs->content[r * (r > 0)] = 0;
 		if (r < BUFFER_SIZE || ft_strchr(curs->content, '\n', BUFFER_SIZE) > -1)
 			break ;
-		curs->next = malloc(sizeof(t_chunk));
+		curs->next = new_chunk();
 		curs = curs->next;
 	}
 	return (first);
@@ -103,13 +116,14 @@ char	*line_from_chunk(char *rest, t_chunk *first, int n)
 	return (line);
 }
 
-char	*clear_chunks(t_chunk *first)
+void	*clear_chunks(t_chunk *first)
 {
 	t_chunk	*aux;
 
 	while (first)
 	{
 		aux = first->next;
+		free(first->content);
 		free(first);
 		first = aux;
 	}

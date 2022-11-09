@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/11/05 14:49:09 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/09 12:05:16 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*get_next_line(int fd)
 	t_chunk		*first;
 	int			i;
 
-	if (fd < 0)
+	if (fd < 0 || fd == 1 || fd == 2)
 		return (0);
 	if (ft_strchr(rest[fd], '\n', BUFFER_SIZE) > -1)
 		return (line_from_rest(rest[fd]));

@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 14:05:11 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/10/18 12:38:41 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/09 14:40:11 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@
 typedef struct s_chunk
 {
 	struct s_chunk	*next;
-	char			content[BUFFER_SIZE];
+	char			*content;
 }	t_chunk;
 
 char	*get_next_line(int fd);
 char	*line_from_rest(char *rest);
 char	*line_from_chunk(char *rest, t_chunk *first, int n);
-char	*clear_chunks(t_chunk *first);
+void	*clear_chunks(t_chunk *first);
 void	concat(char *dst, char *src, int len);
 
 int		ft_strchr(char *s, char c, int len);

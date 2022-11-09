@@ -6,7 +6,7 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/11/05 12:06:51 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/09 12:37:45 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@ int	ft_strchr(char *s, char c, int len)
 	int	i;
 
 	i = 0;
-	while (s[i] && s[i] != c && i < len)
+	while (i < len && s[i] && s[i] != c)
 		i++;
-	if (i == len || (i == 0 && s[i] != c) || !s[i])
+	if (i == len || s[i] != c)
 		return (-1);
 	return (i + 1);
 }
@@ -39,7 +39,7 @@ void	concat(char *dst, char *src, int len)
 
 	i = 0;
 	j = ft_strlen(dst);
-	while (src[i] && i < len)
+	while (i < len && src[i])
 		dst[j++] = src[i++];
 	dst[j] = 0;
 }
