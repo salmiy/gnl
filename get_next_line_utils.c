@@ -6,9 +6,11 @@
 /*   By: ysalmi <ysalmi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 10:17:32 by ysalmi            #+#    #+#             */
-/*   Updated: 2022/11/09 12:37:45 by ysalmi           ###   ########.fr       */
+/*   Updated: 2022/11/09 15:48:52 by ysalmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "get_next_line.h"
 
 int	ft_strchr(char *s, char c, int len)
 {
@@ -42,4 +44,20 @@ void	concat(char *dst, char *src, int len)
 	while (i < len && src[i])
 		dst[j++] = src[i++];
 	dst[j] = 0;
+}
+
+t_chunk	*new_chunk(int size)
+{
+	t_chunk	*new;
+
+	new = malloc(sizeof(t_chunk));
+	if (new)
+	{
+		new->content = malloc(size);
+		if (new->content)
+			return (new);
+		free(new);
+		return (0);
+	}
+	return (0);
 }
